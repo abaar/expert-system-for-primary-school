@@ -4,6 +4,7 @@ var app = new Vue({
         data: {
             page : 2,
             jawabanfile:false,
+            soalsfile:false,
             ovs_option:false,
             materis:[
                 ["Bilangan 0",75],
@@ -87,46 +88,35 @@ var app = new Vue({
                 ],
             relation:[],
             node : [
-                {id:0,label:"C1",x:-225, y:-100},
-                {id:1,label:"C2",x:0, y:-200},
-                {id:2,label:"C3",x:-125, y:-100},
-                {id:3,label:"C4",x:25, y:-100},
-                {id:4,label:"C5",x:225, y:-100},
-                {id:5,label:"C6",x:-175, y:0},
-                {id:6,label:"C7",x:-25, y:0},
-                {id:7,label:"C8",x:-225, y:100},
-                {id:8,label:"C9",x:-125, y:100},
-                {id:9,label:"C10",x:-175, y:200},
-                {id:10,label:"C11",x:-25, y:200},
+                {id:0,label:"Bilangan 0",x:-225, y:-100},
+                {id:1,label:"Bilangan Bulat Positif",x:0, y:-200},
+                {id:2,label:"Penjumlahan Bilangan",x:-75, y:-100},
+                {id:3,label:"Bilangan Ganjil",x:100, y:-100},
+                {id:4,label:"Bilangan Genap",x:275, y:-100},
+                {id:5,label:"Pengurangan Bilangan",x:-175, y:0},
+                {id:6,label:"Perkalian Bilangan",x:-25, y:0},
+                {id:7,label:"Bilangan Bulat Negatif",x:-225, y:100},
+                {id:8,label:"Pembagian Bilangan Bulat",x:-15, y:100},
+                {id:9,label:"Bilangan Prima",x:-175, y:200},
+                {id:10,label:"Bilangan Pecahan",x:-25, y:200},
             ],
             criticalnode:[],
             abilitynode:[],
             edge:[],
             siswa:[
-                    ["3","1","","","","111111111111101110000011000000"],
-                    ["3","2","","","","111111111111111110111011010000"],
-                    ["3","3","","","","110110111110101001000101001100"],
-                    ["3","4","","","","111111111110101000100111001010"],
-                    ["3","6","","","","111110000011111000001111100000"],
-                    ["3","8","","","","111111111111101010010111100101"],
-                    ["3","10","","","","111111111101101000100111110100"],
-                    ["3","11","","","","111111111101101100010011100000"],
-                    ["3","13","","","","111111111110101001000000000010"],
-                    ["3","14","","","","111111111100101110000111110100"],
+                    ["3","1","","","Andreas Alantius Taslulu","111111111111101110000011000000"],
+                    ["3","2","","","Arnetta Arya Tjwa","111111111111111110111011010000"],
+                    ["3","3","","","Brigitta Rayi Ayu Triyanti","110110111110101001000101001100"],
+                    ["3","4","","","Chelsea Terry Karyadinata","111111111110101000100111001010"],
+                    ["3","6","","","Cyrilus Abnertya Hartono","111110000011111000001111100000"],
+                    ["3","8","","","Della Vianata","111111111111101010010111100101"],
+                    ["3","10","","","Jesselyn Suwignyo","111111111101101000100111110100"],
+                    ["3","11","","","Joachim Stefanson","111111111101101100010011100000"],
+                    ["3","13","","","Joyce Caroline","111111111110101001000000000010"],
+                    ["3","14","","","Kimiko Fradella Walalangi","111111111100101110000111110100"],
                  ],
             kelas:[],
             option:[
-                {'code':0,'label':'ID1'},
-                {'code':1,'label':'ID2'},
-                {'code':2,'label':'ID3'},
-                {'code':3,'label':'ID4'},
-                {'code':4,'label':'ID5'},
-                {'code':5,'label':'ID6'},
-                {'code':6,'label':'ID7'},
-                {'code':7,'label':'ID8'},
-                {'code':8,'label':'ID9'},
-                {'code':9,'label':'ID10'},
-                {'code':10,'label':'ID11'},
             ],
             chosen_result:"",
             sorted_siswa:[],
@@ -140,6 +130,23 @@ var app = new Vue({
                         edges: [
                         ],
                         options: {
+                            locales:{
+                                en:{
+                                    edit: 'Ubah',
+                                    del: 'Hapus',
+                                    back: 'Kembali',
+                                    addNode: 'Add Node',
+                                    addEdge: 'Tambah Relasi',
+                                    editNode: 'Edit Node',
+                                    editEdge: 'Ubah Relasi',
+                                    addDescription: 'Click in an empty space to place a new node.',
+                                    edgeDescription: 'Klik pada sebuah node dan tarik ke node yang ingin dihubungkan!',
+                                    editEdgeDescription: 'Click on the control points and drag them to a node to connect to it.',
+                                    createEdgeError: 'Cannot link edges to a cluster.',
+                                    deleteClusterError: 'Clusters cannot be deleted.',
+                                    editClusterError: 'Clusters cannot be edited.'
+                                }
+                            },
                             manipulation: {
                                 enabled: true,
                                 initiallyActive: true,
@@ -299,6 +306,7 @@ var app = new Vue({
         created:function(){
             this.criticalnode = Array.from(this.node);
             this.abilitynode = Array.from(this.node);
+            this.resetOption();
         },
         methods:{
             getRelationAndNextPage:function(){
@@ -320,12 +328,6 @@ var app = new Vue({
                 }
 
                 this.page=3;
-            },
-            onpageload:function(){
-                this.getChartConfig();
-            },
-            created:function(){
-                this.onpageload();
             },
             movetopage:function(page){
                 this.page = page;
@@ -455,6 +457,43 @@ var app = new Vue({
 
                 }
             },
+            argMax(array){
+                max=-1;
+                id=-1;
+                for(var i =0 ; i<array.length; ++i){
+                    if(array[i]!=null && array[i]>=max){
+                        max=array[i];
+                        id=i;
+                    }
+                }
+                
+                if(id==-1){
+                    return "-";
+                }else if(id==0){
+                    return "SANGAT KURANG";
+                }else if(id==1){
+                    return "KURANG";
+                }else if(id==2){
+                    return "CUKUP";
+                }else if(id==3){
+                    return "BAIK";
+                }else if(id==4){
+                    return "SANGAT BAIK";
+                }
+            },
+            computeRofFuzzy(r,value){
+                if(r==1){
+                    return parseFloat(parseFloat(0.25-value)/parseFloat(0.25-0));  
+                }else if(r==2){
+                    return (value>0  && value<=0.25)?parseFloat(parseFloat(value-0)/parseFloat(0.25-0)):parseFloat(parseFloat(0.5-value)/parseFloat(0.5-0.25));  
+                }else if(r==3){
+                    return (value>0.25  && value<=0.5)?parseFloat(parseFloat(value-0.25)/parseFloat(0.5-0.25)):parseFloat(parseFloat(0.75-value)/parseFloat(0.75-0.5));  
+                }else if(r==4){
+                    return (value>0.5  && value<=0.75)?parseFloat(parseFloat(value-0.5)/parseFloat(0.75-0.5)):parseFloat(parseFloat(1-value)/parseFloat(0.1-0.75));  
+                }else if(r==5){
+                    return parseFloat(parseFloat(value-0.75)/parseFloat(1-0.75));  
+                }
+            },
             showResultPage:function(){
                 console.log("part 1");
                 for(var i = 0 ; i < this.siswa.length ; ++i){
@@ -511,8 +550,8 @@ var app = new Vue({
                 for(var i =0 ; i < this.siswa.length; ++i){
                     ee_diff = [];
                     tt_diff = [];
+                    r = []
                     LB = this.getErrorAverage(this.siswa[i][0]);
-                    console.log(LB);
                     for(var j = 0; j < this.materis.length ; ++j){
                         if(this.siswa[i][6][j]==0){
                             ee_diff.push(0);
@@ -524,11 +563,58 @@ var app = new Vue({
                         }else{
                             tt_diff.push(parseFloat(this.siswa[i][7][j])-(parseFloat(this.materis[j][1])/100.0));
                         }
+                        r.push(["","","","",""]);
                     }
                     this.siswa[i].push(ee_diff);
                     this.siswa[i].push(tt_diff);
+                    ee = this.siswa[i][6];
+                    tt = this.siswa[i][7];
                     
+                    for(var j = 0 ; j < r.length ; ++j){
+                        if(tt[j] == 0 && ee[j]==tt[j]){
+                            r[j]=[null,null,null,null,null];
+                        }else{
+                            // R1
+                            if(tt[j]<0.25){
+                                r[j][0]=this.computeRofFuzzy(1,tt[j]);
+                            }else{
+                                r[j][0]=0;
+                            }
+                            
+                            // R2
+                            if(tt[j]<0.5 && tt[j]>0){
+                                r[j][1]=this.computeRofFuzzy(2,tt[j]);
+                            }else{
+                                r[j][1]=0;
+                            }
+
+                            // R3
+                            if(tt[j]<0.75 && tt[j]>0.25){
+                                r[j][2]=this.computeRofFuzzy(3,tt[j]);
+                            }else{
+                                r[j][2]=0;
+                            }
+
+                            // R4
+                            if(tt[j]<1 && tt[j]>0.5){
+                                r[j][3]=this.computeRofFuzzy(4,tt[j]);
+                            }else{
+                                r[j][3]=0;
+                            }
+                            
+                            // R5
+                            if(tt[j]>0.75){
+                                r[j][4]=this.computeRofFuzzy(5,tt[j]);
+                            }else{
+                                r[j][4]=0;
+                            }
+                        }
+                    }
+                    this.siswa[i].push(r)
                 }
+
+
+
                 this.generateEdges();
 
                 this.page=5;
@@ -558,7 +644,18 @@ var app = new Vue({
                 }
 
             },
-            generateAbility:function(ofUser){},
+            generateAbility:function(ofUser){
+                rOfUser = this.siswa[ofUser][10];
+                console.log(rOfUser);
+                for(var i=0; i<rOfUser.length; ++i){
+                    argmax = this.argMax(rOfUser[i]);
+                    thenode = this.node[i];
+                    tobelabel = this.materis[i][0] + " ["+ argmax +"]";
+                    console.log(argmax);
+                    console.log(tobelabel);
+                    this.abilitynode.splice(i,1,{id:thenode['id'], label:tobelabel, x: thenode['x'], y:thenode['y'], font:{multi:true} });
+                }
+            },
             generateEdges:function(){
                 this.edge=[];
                 for(var i = 0 ; i < this.relation.length ; ++i){
@@ -571,15 +668,21 @@ var app = new Vue({
                         }
                     }
                 }
+            },
+            resetOption:function(){
+                this.option=[];
+                for(var i =0 ; i < this.siswa.length ; ++i){
+                    this.option.push({'code':i , 'label':'ID'+(i+1)+" - "+this.siswa[i][4]});
+                }
             }
         },
         watch:{
-            materis:function(){
-
-            },
             chosen_result:function(){
                 this.generateCriticalTopics(this.chosen_result['code']);
                 this.generateAbility(this.chosen_result['code']);
+            },
+            siswa:function(){
+                this.resetOption();
             }
         }
     })
