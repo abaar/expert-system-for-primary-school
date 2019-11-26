@@ -84,10 +84,11 @@
                             <form class="form-horizontal m-t-xl" action="#">
                                     <div class="fileinput fileinput-new input-group" data-provides="fileinput">
                                         <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
-                                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Pilih file</span><span class="fileinput-exists">Ganti</span><input type="file" name="..."></span>
+                                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Pilih file</span><span class="fileinput-exists">Ganti</span><input type="file" v-on:change="parseObject($event)" name="..."></span>
                                         <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Hapus</a>
                                     </div>
-                                    <button type="button" class="btn col-xs-12 btn-success btn-outline">Gunakan</button>
+                                    <button type="button" v-on:click="pleaseUseTheFile" :disabled="usefiledisabled" v-bind:class="{disabled:usefiledisabled}" class="btn col-xs-12 btn-success">Gunakan</button>
+                                    <p v-if="usefiledisabled">Klik 'Pilih File' dan tunggulah aplikasi membacanya!</p>
                             </form>
                         </div>
                     </div>
@@ -165,7 +166,7 @@
                                 <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Pilih file</span><span class="fileinput-exists">Ganti</span><input type="file" name="..."></span>
                                 <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Hapus</a>
                             </div>
-                            <button type="button" class="btn col-xs-12 btn-primary btn-outline">Gunakan</button>
+                            <button type="button" class="btn col-xs-12 btn-primary disabled" disabled>Cooming Soon</button>
                     </form>
                     <br>
                     <br>
@@ -238,7 +239,7 @@
                                 <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Pilih file</span><span class="fileinput-exists">Ganti</span><input type="file" name="..."></span>
                                 <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Hapus</a>
                             </div>
-                            <button type="button" class="btn col-xs-12 btn-primary btn-outline">Gunakan</button>
+                            <button type="button" class="btn col-xs-12 btn-primary disabled" disabled>Cooming Soon</button>
                     </form>
                     <br>
                     <form action="#" class="form-horizontal m-t-xl" v-if="!jawabanfile">
@@ -331,13 +332,35 @@
                 </div>
                 <div class="col-md-8 col-md-offset-2">
                     <form class="form-horizontal m-b-xl" action="#">
-                            <button type="button" v-on:click="page=1" class="btn col-xs-6 btn-success btn-outline">Kembali</button>
-                            <button type="button" class="btn col-xs-6 btn-primary btn-outline">Selanjutnya</button>
+                            <button type="button" v-on:click="page=4" class="btn col-xs-6 btn-success btn-outline">Kembali</button>
+                            <button type="button" v-on:click="generateDownloadAble" class="btn col-xs-6 btn-primary btn-outline">Selanjutnya</button>
                     </form>
                 </div>
             </div>
             <!-- end of page 5-->
-
+            <div class="row" v-if="page==6">
+                <div class="col-md-6 vh100 no-padding ">
+                    <div class="vertical-center col-md-12 hm-border-right-straight">
+                        <div class=" col-md-8 col-md-offset-4">
+                            <h2>Download</h2>
+                            <div class="m-t-xl" action="#" id="download-container">
+                                    <a class="btn btn-outline col-xs-12 btn-success" :href="'data:' + downloadable_data +' '" download="expert_complete_data.json">Download JSON</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6  vh100 no-padding">
+                    <div class="vertical-center col-xs-12 col-md-12">
+                        <div class="col-md-8 col-xs-12">
+                                <h2>Mulai Baru!</h2>
+                                <form class="form-horizontal m-t-xl" action="#">
+                                        <button type="button" v-on:click="page=2" class="btn col-xs-12 btn-primary btn-outline">Mulai Baru</button>
+                                </form>
+                        </div>
+                    </div>
+                </div>
+            <!-- end of page -->
+            </div>
 
         <!-- end of app-container -->
         </div>

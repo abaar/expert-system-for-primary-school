@@ -2,10 +2,11 @@ Vue.component('v-select', VueSelect.VueSelect)
 var app = new Vue({
         el: '#app-container',
         data: {
-            page : 2,
+            page : 1,
             jawabanfile:false,
             soalsfile:false,
             ovs_option:false,
+            usefiledisabled:true,
             materis:[
                 ["Bilangan 0",75],
                 ["Bilangan Bulat Positif",75],
@@ -199,6 +200,8 @@ var app = new Vue({
             ],
             chosen_result:"",
             sorted_siswa:[],
+            downloadable_data:null,
+            uploaded_data:null,
         },
         components:{
             'ovs-network':{
@@ -206,8 +209,7 @@ var app = new Vue({
                 data() {
                     return {
                         nodes: this.$root.node,
-                        edges: [
-                        ],
+                        edges: this.$root.edge,
                         options: {
                             locales:{
                                 en:{
@@ -262,12 +264,16 @@ var app = new Vue({
                 computed: {
                     graph_data() {
                         return {
-                            nodes: this.nodes,
-                            edges: this.edges
+                            nodes: this.$root.node,
+                            edges: this.$root.edge
                         }
                     }
                 },
-
+                methods:{
+                    reset:function(){
+                        this.network = new vis.Network(this.container, this.graph_data, this.options);
+                    }
+                },
                 mounted() {
                     this.container = document.getElementById('mynetwork');
                     this.network = new vis.Network(this.container, this.graph_data, this.options);
@@ -422,19 +428,17 @@ var app = new Vue({
                 isYnegatif = Math.random() < 0.5 ? -1 : 1;
                 visY = visy * isYnegatif;
 
-                this.node.push({id:this.node.length, label:"C"+(this.node.length+1).toString(), x:visx, y:visy});
-
                 this.materis.push(["",""]);
-                for(var i=0 ; i < this.bobots.length ; ++i){
-                    this.bobots[i].push("");
+                
+                for (var i =0 ; i < this.soals.length ; ++i){
+                    this.soals[i][3].push(0);
                 }
-
-                this.soals[0][3].push(0);
             },
             delMateri:function(index){
                 this.materis.splice(index,1);
-                this.node.splice(this.node.length-1,1);
-                this.soals[0][3].splice(index,1);
+                for (var i =0 ; i < this.soals.length ; ++i){
+                    this.soals[i][3].splice(index,1);
+                }
             },
             addQuestion:function(){
                 forbobot = [];
@@ -776,6 +780,50 @@ var app = new Vue({
                 for(var i =0 ; i < this.siswa.length ; ++i){
                     this.option.push({'code':i , 'label':'ID'+(i+1)+" - "+this.siswa[i][4]});
                 }
+            },
+            generateDownloadAble:function(){
+                x = [];
+                for(var i=0; i < this.siswa.length ; ++i){
+
+                    x.push([this.siswa[i][0],this.siswa[i][1],this.siswa[i][2],this.siswa[i][3],this.siswa[i][4],this.siswa[i][5]]);
+                }
+                var obj = {
+                    'soal':this.soals,
+                    'siswa':x,
+                    'node':this.node,
+                    'relation':this.relation,
+                    'materi':this.materis,
+                };
+
+                var data =  "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+                this.downloadable_data = data;
+                this.page=6;
+            },
+            pleaseUseTheFile:function(){
+                this.relation=this.uploaded_data['relation'];
+                this.siswa=this.uploaded_data['siswa'];
+                this.soals=this.uploaded_data['soal'];
+                this.materis=this.uploaded_data['materi'];
+                this.node=this.uploaded_data['node'];
+                this.edge=[];
+                for(var i = 0 ; i < this.relation.length ; ++i){
+                    for(var j =0; j < this.relation.length ; ++j){
+                        if(this.relation[i][j]==1){
+                            this.edge.push({
+                                'from':j,
+                                'to':i,
+                            });
+                            console.log(this.edge);
+                        }
+                    }
+                }
+                this.page=2;
+            },
+            async parseObject(event){
+                this.usefiledisabled=true;
+                var data = await event.target.files[0].text();
+                this.uploaded_data=JSON.parse(data);
+                this.usefiledisabled=false;
             }
         },
         watch:{
@@ -785,6 +833,36 @@ var app = new Vue({
             },
             siswa:function(){
                 this.resetOption();
+            },
+            materis:function(){
+                node_temp = this.node;
+                this.relation=[];
+                this.edge=[];
+                this.node=[];
+                visheight = ($("#mynetwork").children().first().children().first().height() - 20)/2;
+                viswidth = ($("#mynetwork").children().first().children().first().width() - 20)/2;
+
+                for(var i =0; i < this.materis.length ; ++i){
+                    if(i<node_temp.length ){
+                        this.node.push({id:this.node.length, label:this.materis[i][0], x:node_temp[i]['x'], y:node_temp[i]['y']});
+                    }else{
+                        visx = Math.floor(Math.random() * viswidth) + 1;
+                        isXnegatif = Math.random() < 0.5 ? -1 : 1;
+                        visx = visx * isXnegatif;
+        
+                        visy = Math.floor(Math.random() * visheight) + 1;
+                        isYnegatif = Math.random() < 0.5 ? -1 : 1;
+                        visY = visy * isYnegatif;
+                        
+                        if(this.materis[i][0].length == 0){
+
+                            this.node.push({id:this.node.length, label:"C"+(this.node.length+1).toString(), x:visx, y:visy});
+                        }else{
+                            this.node.push({id:this.node.length, label:this.materis[i][0], x:visx, y:visy});
+                        }
+                    }
+                }
+                this.$refs.petakonsep_graph.reset();
             }
         }
     })
